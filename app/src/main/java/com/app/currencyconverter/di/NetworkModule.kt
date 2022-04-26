@@ -1,6 +1,6 @@
 package com.app.currencyconverter.di
 
-import com.app.currencyconverter.constants.Constants.BASE_URL
+import com.app.currencyconverter.common.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

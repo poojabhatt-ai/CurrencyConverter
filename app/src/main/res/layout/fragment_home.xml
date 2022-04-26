@@ -1,9 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="HomeViewModel"
+            type="com.app.currencyconverter.presentation.ui.home.HomeViewModel" />
+    </data>
+<androidx.constraintlayout.widget.ConstraintLayout
+     android:layout_width="match_parent"
     android:padding="10dp"
     android:layout_height="match_parent">
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -20,25 +24,27 @@
             android:layout_width="wrap_content"
             android:layout_weight="0.2"
             android:gravity="center"
+            android:selectedItemPosition="@={HomeViewModel.fromValue}"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             />
 
-        <ImageButton
+        <ImageView
             android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_weight="0.2"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:layout_gravity="center"
-            app:srcCompat="@android:drawable/arrow_down_float"
-            />
+            app:srcCompat="@drawable/ic_baseline_swap"
+            android:contentDescription="@null" />
 
         <Spinner
             android:id="@+id/spinnerTo"
             android:layout_width="wrap_content"
             android:layout_weight="0.2"
+
             android:layout_height="wrap_content"
             />
     </androidx.appcompat.widget.LinearLayoutCompat>
@@ -46,37 +52,46 @@
         android:layout_width="match_parent"
         android:orientation="horizontal"
         android:id="@+id/container2"
+        android:padding="10dp"
         android:layout_marginLeft="10dp"
+        android:gravity="center"
         android:layout_marginTop="50dp"
+        android:weightSum="0.4"
         android:layout_marginRight="10dp"
         app:layout_constraintTop_toBottomOf="@+id/container1"
         android:layout_height="wrap_content">
+
         <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:hint="From"
             android:layout_weight="0.2"
-            tools:layout_editor_absoluteX="1dp"
-            tools:layout_editor_absoluteY="145dp">
+            >
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="10" />
+                android:inputType="number"
+                android:imeOptions="actionDone|actionSend|actionGo"
+                android:onEditorAction="@{(view,actionId,event) -> HomeViewModel.onDoneClicked(view,actionId,event)}"
+                android:text="@={HomeViewModel.selectedValue}"
+                />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="wrap_content"
-            android:layout_weight="0.2"
-            android:layout_height="wrap_content"
-            tools:layout_editor_absoluteX="1dp"
-            android:layout_marginLeft="10dp"
-            tools:layout_editor_absoluteY="145dp">
 
-            <com.google.android.material.textfield.TextInputEditText
+
+
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="10" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:hint="@string/to"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_weight="0.2"
+                android:layout_height="match_parent"
+                android:text="@{HomeViewModel.calculatedValue}"
+               />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -88,8 +103,9 @@
         android:layout_marginTop="50dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Details"
+        android:text="@string/details"
         />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

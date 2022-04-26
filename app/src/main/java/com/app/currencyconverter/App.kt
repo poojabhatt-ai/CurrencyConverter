@@ -1,4 +1,4 @@
-package com.app.currencyconverter.di
+package com.app.currencyconverter
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

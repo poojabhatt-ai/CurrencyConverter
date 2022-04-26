@@ -1,4 +1,4 @@
-package com.app.currencyconverter.constants
+package com.app.currencyconverter.common
 
 object Constants {
     const val BASE_URL="http://data.fixer.io/api/"
