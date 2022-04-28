@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="item"
+            type="com.app.currencyconverter.presentation.ui.details.CurrencyHistoryData" />
+
+    </data>
+<LinearLayout android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="10dp"
+    android:layout_height="wrap_content">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:weightSum="0.4"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/dateTxt"
+            android:layout_width="0dp"
+            android:layout_weight="0.2"
+            android:text="@{item.date}"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/toCurrency"
+            android:layout_width="0dp"
+            android:layout_weight="0.2"
+            android:text="@{item.toSymbol}"
+            android:layout_height="wrap_content"/>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:weightSum="0.4"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/fromCurrency"
+            android:layout_width="0dp"
+            android:layout_weight="0.2"
+            android:text="@{item.fromValue}"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/conversionValue"
+            android:layout_width="0dp"
+            android:layout_weight="0.2"
+            android:text="@{item.convertedValue}"
+            android:layout_height="wrap_content"/>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</LinearLayout>
+</layout>

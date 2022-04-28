@@ -12,4 +12,5 @@ fun CurrencyDataModel.toCurrencyData()= CurrencyDataDomain(
 
    fun CurrencyValueModel.toConvertedValues()= CurrencyValueDomain(
         success = success,
+       date =date,
         rates = rates)

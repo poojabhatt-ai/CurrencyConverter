@@ -16,11 +16,12 @@ class CurrencyRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getCurrencyValues(
-        key: String,
-        base: String,
-        symbols: String
-    ): CurrencyValueModel {
-        return apiService.getCurrencyValues(key, base, symbols)
+        key: String,base:String,symbol:String): CurrencyValueModel {
+        return apiService.getCurrencyValues(key, base, symbol)
+    }
+
+    override suspend fun getHistoricalValues(url: String, key: String,base:String,symbol:String): CurrencyValueModel {
+        return apiService.getHistoricalValues(url, key,base,symbol)
     }
 
 

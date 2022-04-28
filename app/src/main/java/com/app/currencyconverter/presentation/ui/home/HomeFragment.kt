@@ -1,19 +1,22 @@
 package com.app.currencyconverter.presentation.ui.home
 
-import android.R
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.app.currencyconverter.R
 import com.app.currencyconverter.common.Constants
+import com.app.currencyconverter.common.ResultDataState
+import com.app.currencyconverter.common.Utility
 import com.app.currencyconverter.databinding.FragmentHomeBinding
 import com.app.currencyconverter.domain.model.CurrencyDataDomain
 import com.app.currencyconverter.domain.model.CurrencyValueDomain
-import com.app.currencyconverter.presentation.ui.home.adapter.Adapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -37,26 +40,49 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        homeViewModel.getCurrencyData(accessKey)
+        if(Utility.isNetworkAvailable(context)){
+            homeViewModel.getCurrencyData(accessKey)
+        }
+
         observerListeners()
         observerApiResponse()
     }
 
     private fun observerListeners() {
-        homeViewModel.checkCalculatedValue.observe(viewLifecycleOwner) {
+        homeViewModel.convertCurrency.observe(viewLifecycleOwner) {
             callConversionApi()
         }
-        homeViewModel.fromValue.observe(viewLifecycleOwner){
+        homeViewModel.spinnerFromPos.observe(viewLifecycleOwner){
+            callConversionApi()
+        }
+        homeViewModel.spinnerToPos.observe(viewLifecycleOwner){
             callConversionApi()
         }
 
+
+        binding.swapCurrency.setOnClickListener {
+            swapSpinnerValues()
+        }
+        binding.detailsPage.setOnClickListener {
+            val bundle = bundleOf("inputValue" to binding.fromEditText.text.toString(),
+            "fromCurrency" to binding.spinnerFrom.selectedItem,
+            "toCurrency" to binding.spinnerTo.selectedItem)
+            findNavController().navigate(R.id.navigation_dashboard, bundle)
+        }
     }
 
-    private fun callConversionApi() {
-        val toCurrency = binding.spinnerTo.selectedItem
-        val fromCurrency = binding.spinnerFrom.selectedItem
-        val symbols = "$fromCurrency,$toCurrency"
-        homeViewModel.getCurrencyValues(accessKey, symbols)
+    private fun swapSpinnerValues() {
+        val pos1 = binding.spinnerTo.selectedItemPosition
+        val pos2 = binding.spinnerFrom.selectedItemPosition
+        binding.fromEditText.setText("1")
+        binding.spinnerFrom.setSelection(pos1)
+        binding.spinnerTo.setSelection(pos2)
+    }
+
+    private fun callConversionApi(){
+
+        val symbols = "${binding.spinnerFrom.selectedItem},${binding.spinnerTo.selectedItem}"
+        homeViewModel.getCurrencyValues(Constants.ACCESS_KEY, symbols)
     }
 
     private fun observerApiResponse() {
@@ -86,27 +112,24 @@ class HomeFragment : Fragment() {
 
 
     private fun onResultData(currencyValueDomain: CurrencyValueDomain) {
-       val currentRates= currencyValueDomain.rates
-       // val data1= currentRates[binding.spinnerFrom.selectedItem]
-        val data2= currentRates[binding.spinnerFrom.selectedItem]
-        val getSelected: Double? = homeViewModel.selectedValue.value?.toDouble()
-        val result = data2?.let { getSelected?.times(it) }
-        homeViewModel.calculatedValue.value = result.toString()
-
+        if(currencyValueDomain.success){
+        val fromCurrency= currencyValueDomain.rates[binding.spinnerFrom.selectedItem]
+        val toCurrency= currencyValueDomain.rates[binding.spinnerTo.selectedItem]
+            if (fromCurrency != null && toCurrency!=null) {
+                homeViewModel.valueCalculation(fromCurrency,toCurrency)
+            }
+        }
+        binding.progressBar.visibility = View.GONE
+        Utility.hideKeyboard(requireActivity())
     }
 
     private fun showLoading() {
-
+        binding.progressBar.visibility = View.VISIBLE
     }
+
     private fun onLoaded(itemData: CurrencyDataDomain) {
-        val rateValues=ArrayList<String>()
-        for(data in itemData.symbols){
-            rateValues.add(data.key)
-        }
-
-        binding.spinnerFrom.adapter = context?.let { Adapter(it.applicationContext, R.layout.simple_spinner_dropdown_item, rateValues) }
-        binding.spinnerTo.adapter = context?.let { Adapter(it.applicationContext, R.layout.simple_spinner_dropdown_item, rateValues) }
-
+        binding.progressBar.visibility = View.GONE
+        binding.currencyData= convertToList(itemData)
     }
 
 

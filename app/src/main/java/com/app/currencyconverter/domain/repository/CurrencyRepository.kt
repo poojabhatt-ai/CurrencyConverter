@@ -7,5 +7,6 @@ interface CurrencyRepository {
 
     suspend fun getCurrencyData(key: String): CurrencyDataModel
     suspend fun getCurrencyValues(key: String,base:String,symbols:String): CurrencyValueModel
+    suspend fun getHistoricalValues(url:String,key: String,base:String,symbols:String): CurrencyValueModel
 
 }

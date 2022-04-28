@@ -4,6 +4,7 @@ import com.app.currencyconverter.data.model.CurrencyDataModel
 import com.app.currencyconverter.data.model.CurrencyValueModel
 import retrofit2.http.GET
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 interface CurrencyApiService {
 
@@ -14,4 +15,9 @@ interface CurrencyApiService {
     @GET("latest")
     suspend fun getCurrencyValues(
         @Query("access_key") key: String,@Query("base") base:String,@Query("symbols")symbols:String): CurrencyValueModel
+
+    @GET
+    suspend fun getHistoricalValues(@Url url: String,
+        @Query("access_key") key: String,@Query("base") base:String,@Query("symbols")symbols:String): CurrencyValueModel
+
 }

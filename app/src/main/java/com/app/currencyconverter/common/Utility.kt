@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.app.currencyconverter.common
 
 import android.app.Activity
@@ -7,9 +9,24 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.*
 
 object Utility {
 
+    //hide keyboard
+    fun hideKeyboard(activity: Activity) {
+        val imm: InputMethodManager =
+            activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        //Find the currently focused view, so we can grab the correct window token from it.
+        var view: View? = activity.currentFocus
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = View(activity)
+        }
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
 
     //check if network is connected
     fun isNetworkAvailable(context: Context?): Boolean {
@@ -39,5 +56,33 @@ object Utility {
             }
         }
         return false
+    }
+    private fun getCalculatedDate(date: String, days: Int): String? {
+        return try{
+            val cal = Calendar.getInstance()
+            val s = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+            if (date.isNotEmpty()) {
+                cal.time = s.parse(date)
+            }
+            cal.add(Calendar.DAY_OF_YEAR, -days)
+            val newDate: Date = cal.time
+            s.format(newDate)
+        } catch (exception:ParseException){
+            null
+        }
+    }
+
+    private fun getCurrentDate(): String {
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd",Locale.US)
+        return simpleDateFormat.format(Date())
+
+    }
+
+    fun getLastThreeDateList(): ArrayList<String> {
+        val dateString = ArrayList<String>()
+        dateString.add(getCurrentDate())
+        getCalculatedDate(getCurrentDate(), 1)?.let { dateString.add(it) }
+        getCalculatedDate(getCurrentDate(), 2)?.let { dateString.add(it) }
+        return dateString
     }
 }
