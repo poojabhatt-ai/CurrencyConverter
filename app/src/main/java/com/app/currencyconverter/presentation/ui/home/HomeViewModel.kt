@@ -7,7 +7,9 @@ import androidx.annotation.CallSuper
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.app.currencyconverter.common.Constants
 import com.app.currencyconverter.common.ResultDataState
+import com.app.currencyconverter.common.Utility
 import com.app.currencyconverter.domain.usecase.GetCurrencyUseCase
 import com.app.currencyconverter.domain.usecase.GetValuesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,9 +32,12 @@ class HomeViewModel @Inject constructor(
     val calculatedValue = MutableLiveData<String>()
     val spinnerFromPos = MutableLiveData<Int>()
     val spinnerToPos = MutableLiveData<Int>()
-
     val selectedValue = MutableLiveData("1")
     val convertCurrency = MutableLiveData<Boolean>()
+
+    init{
+            getCurrencyData(Constants.ACCESS_KEY)
+        }
 
 
     fun getCurrencyData(key: String) {
@@ -79,8 +84,8 @@ class HomeViewModel @Inject constructor(
 
     fun valueCalculation(fromCurrency: Double, toCurrency: Double) {
         val getSelected: Double? = selectedValue.value?.toDouble()?.times(fromCurrency)
-        val result = toCurrency?.let { getSelected?.times(it) }
-        calculatedValue.value = result.toString()
+        val result = toCurrency.let { getSelected?.times(it) }
+        calculatedValue.value = Utility.formatValue(result)
 
     }
 

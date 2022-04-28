@@ -18,6 +18,7 @@ import com.app.currencyconverter.databinding.FragmentHomeBinding
 import com.app.currencyconverter.domain.model.CurrencyDataDomain
 import com.app.currencyconverter.domain.model.CurrencyValueDomain
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -40,9 +41,6 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if(Utility.isNetworkAvailable(context)){
-            homeViewModel.getCurrencyData(accessKey)
-        }
 
         observerListeners()
         observerApiResponse()
@@ -64,8 +62,7 @@ class HomeFragment : Fragment() {
             swapSpinnerValues()
         }
         binding.detailsPage.setOnClickListener {
-            val bundle = bundleOf("inputValue" to binding.fromEditText.text.toString(),
-            "fromCurrency" to binding.spinnerFrom.selectedItem,
+            val bundle = bundleOf("fromCurrency" to binding.spinnerFrom.selectedItem,
             "toCurrency" to binding.spinnerTo.selectedItem)
             findNavController().navigate(R.id.navigation_dashboard, bundle)
         }
@@ -127,9 +124,13 @@ class HomeFragment : Fragment() {
         binding.progressBar.visibility = View.VISIBLE
     }
 
-    private fun onLoaded(itemData: CurrencyDataDomain) {
-        binding.progressBar.visibility = View.GONE
-        binding.currencyData= convertToList(itemData)
+    private suspend fun onLoaded(itemData: CurrencyDataDomain) {
+        if(itemData.success) {
+            binding.progressBar.visibility = View.GONE
+            binding.currencyData = convertToList(itemData)
+            delay(500)
+            binding.spinnerFrom.setSelection(43)
+        }
     }
 
 

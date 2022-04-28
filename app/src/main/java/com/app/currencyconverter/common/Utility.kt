@@ -9,6 +9,8 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -84,5 +86,11 @@ object Utility {
         getCalculatedDate(getCurrentDate(), 1)?.let { dateString.add(it) }
         getCalculatedDate(getCurrentDate(), 2)?.let { dateString.add(it) }
         return dateString
+    }
+
+    fun formatValue(value: Double?): String {
+        val symbols = DecimalFormatSymbols(Locale.US)
+        val df = DecimalFormat("0.0000",symbols)
+        return df.format(value)
     }
 }

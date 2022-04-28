@@ -4,6 +4,7 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import com.app.currencyconverter.CoroutineTestRule
 import com.app.currencyconverter.domain.model.CurrencyValueDomain
 import com.app.currencyconverter.domain.usecase.GetHistoricalUseCase
+import com.app.currencyconverter.domain.usecase.GetValuesUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -21,6 +22,8 @@ class DetailsViewModelTest {
 
     @MockK
     lateinit var useCaseValuesCurrency: GetHistoricalUseCase
+    @MockK
+    lateinit var useCaseOtherCurrency: GetValuesUseCase
 
     @ExperimentalCoroutinesApi
     @Rule
@@ -32,7 +35,7 @@ class DetailsViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        detailsViewModel = DetailsViewModel( useCaseValuesCurrency)
+        detailsViewModel = DetailsViewModel( useCaseValuesCurrency,useCaseOtherCurrency)
     }
 
 
@@ -49,5 +52,19 @@ class DetailsViewModelTest {
 
         }
         coVerify { useCaseValuesCurrency.execute(any(), any(), any(),any()) }
+    }
+
+    @Test
+    fun getOtherValueSuccess() {
+        runBlocking {
+            coEvery {
+                useCaseOtherCurrency.execute(any(),any(),any())
+            } answers   {
+                CurrencyValueDomain(true,"", emptyMap())
+            }
+            detailsViewModel.getOtherValues("","")
+
+        }
+        coVerify { useCaseOtherCurrency.execute(any(),any(),any()) }
     }
 }

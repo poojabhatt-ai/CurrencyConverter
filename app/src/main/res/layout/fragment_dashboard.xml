@@ -9,18 +9,34 @@
             type="com.app.currencyconverter.presentation.ui.details.DetailsViewModel" />
 
     </data>
-
-    <RelativeLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
+
+        >
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:weightSum="0.4"
+        android:padding="4dp"
         >
 
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler"
+            android:id="@+id/recyclerHistory"
+            android:layout_weight="0.2"
             android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+       <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerOther"
+           android:layout_weight="0.2"
+           android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
 
-    </RelativeLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 </layout>

@@ -15,14 +15,12 @@ import com.app.currencyconverter.common.Utility
 import com.app.currencyconverter.databinding.FragmentDashboardBinding
 import com.app.currencyconverter.domain.model.CurrencyValueDomain
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class DetailsFragment : Fragment() {
 
-    private var enteredValue: String? = null
     private var from: String? = null
     private var toCurrency: String? = null
     private var _binding: FragmentDashboardBinding? = null
@@ -30,7 +28,8 @@ class DetailsFragment : Fragment() {
     private val detailsViewModel: DetailsViewModel by viewModels()
 
     private val binding get() = _binding!!
-    private val recyclerAdapter = DataBindingRecyclerAdapter()
+    private val recyclerAdapter = HistoryCurrencyAdapter()
+    private val recyclerAdapter1 = DataBindingRecyclerAdapter()
 
 
     override fun onCreateView(
@@ -58,22 +57,51 @@ class DetailsFragment : Fragment() {
                 }
             }
         }
+
+        lifecycleScope.launch {
+            detailsViewModel.uiStateResult1.collect { state ->
+                when(state){
+                    is ResultDataState.Loaded -> onResultData1(state.resultValues as CurrencyValueDomain)
+                    is ResultDataState.Error -> showError(state.message)
+                    else -> showLoading()
+                }
+            }
+        }
+    }
+
+    private fun onResultData1(resultData: CurrencyValueDomain) {
+        if(resultData.success) {
+            val fromCurrency = resultData.rates[from]
+            for(data in resultData.rates){
+                val toCurrencyValue=data.value
+               val calculated= Utility.formatValue((fromCurrency!!).times(toCurrencyValue))
+                val historyData = CurrencyHistoryData(data.key, calculated)
+                recyclerAdapter1.addItem(historyData)
+            }
+
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        enteredValue=arguments?.getString("inputValue")
         from=  arguments?.getString("fromCurrency")
         toCurrency=  arguments?.getString("toCurrency")
        val dateList= Utility.getLastThreeDateList()
-       for(data in dateList) {
-           if (Utility.isNetworkAvailable(context)) {
-               detailsViewModel.getCurrencyValues(data, Constants.ACCESS_KEY, "$from,$toCurrency")
-           }
-       }
-        binding.recycler.apply {
+        if (Utility.isNetworkAvailable(context)) {
+
+            for (data in dateList) {
+                detailsViewModel.getCurrencyValues(data, Constants.ACCESS_KEY, "$from,$toCurrency")
+            }
+            val symbols = "$from,EGP,USD,CAD,EUR,GBP,JPY,INR,NPR,NZD,OMR"
+            detailsViewModel.getOtherValues(Constants.ACCESS_KEY, symbols)
+        }
+        binding.recyclerHistory.apply {
             this.layoutManager = LinearLayoutManager(context)
             this.adapter = recyclerAdapter
+        }
+        binding.recyclerOther.apply {
+            this.layoutManager = LinearLayoutManager(context)
+            this.adapter = recyclerAdapter1
         }
     }
 
@@ -81,13 +109,9 @@ class DetailsFragment : Fragment() {
         if(resultData.success) {
             val fromCurrency = resultData.rates[from]
             val toCurrencyValue = resultData.rates[toCurrency]
-            val calculateValue =
-                ((enteredValue?.toDouble())?.times(fromCurrency!!))?.times(toCurrencyValue!!)
-            val euroConversion = "$enteredValue EUR= $fromCurrency $from"
-            val historyData = CurrencyHistoryData(resultData.date,
-                euroConversion,
-                toCurrency.toString(),
-                calculateValue.toString())
+            val calculateValue = Utility.formatValue((fromCurrency!!).times(toCurrencyValue!!))
+            val euroConversion = "1 $from= $calculateValue $toCurrency"
+            val historyData = CurrencyHistoryData(resultData.date,euroConversion)
             recyclerAdapter.addItem(historyData)
         }
     }
